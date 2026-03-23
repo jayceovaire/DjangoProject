@@ -51,11 +51,6 @@ def delete_task(request,pk):
     return Response({"message":"Task deleted"})
 
 
-
-
-
-
-
 @api_view(['POST'])
 def create_task(request):
     serializer = TaskSerializer(data=request.data)
