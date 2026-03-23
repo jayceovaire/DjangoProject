@@ -53,6 +53,7 @@ def delete_task(request,pk):
 @api_view(['POST'])
 def create_task(request):
     serializer = TaskSerializer(data=request.data)
+
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

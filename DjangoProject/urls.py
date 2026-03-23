@@ -18,12 +18,12 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
 
-def home(request):
-    return JsonResponse({'message': 'Task Tracker API is running'})
+from DjangoProject import views
+
 
 
 urlpatterns = [
-    path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('api/', include('tasks.urls')),
+    path('', views.home, name='home'),
 ]
