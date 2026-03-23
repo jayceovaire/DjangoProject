@@ -1,9 +1,237 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Tracker</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4efe7;
+            --card: #fffaf3;
+            --border: #d8c8b4;
+            --text: #1f1a17;
+            --muted: #6b5f55;
+            --accent: #b85c38;
+            --accent-dark: #8f4325;
+            --success: #2e6a4f;
+            --danger: #8f2d2d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            background: linear-gradient(180deg, #efe6d8 0%, var(--bg) 100%);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        h1, h2, p {
+            margin-top: 0;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 12px 30px rgba(31, 26, 23, 0.08);
+        }
+
+        .panel + .panel {
+            margin-top: 24px;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        input,
+        textarea,
+        button {
+            font: inherit;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 16px;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            align-items: flex-start;
+        }
+
+        .task-item.completed {
+            opacity: 0.75;
+            background: #f4f7f3;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-title {
+            margin-bottom: 8px;
+        }
+
+        .task-meta {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .empty {
+            color: var(--muted);
+            margin: 0;
+        }
+
+        @media (max-width: 700px) {
+            .task-item {
+                flex-direction: column;
+            }
+
+            .actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Task Tracker</h1>
+    <main class="page">
+        <section class="panel">
+            <h1>Task Tracker</h1>
+            <p>Create tasks, mark them complete, or remove them when they are done.</p>
+
+            <form method="post" action="{% url 'create-task' %}">
+                {% csrf_token %}
+                <div class="field">
+                    <label for="title">Task title</label>
+                    <input id="title" name="title" type="text" required>
+                </div>
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="Optional details"></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">Create New Task</button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>Tasks</h2>
+
+            {% if tasks %}
+                <ul class="task-list">
+                    {% for task in tasks %}
+                        <li class="task-item {% if task.completed %}completed{% endif %}">
+                            <div>
+                                <h3 class="task-title">{{ task.title }}</h3>
+                                <p class="task-meta">
+                                    Status:
+                                    {% if task.completed %}
+                                        Completed
+                                    {% else %}
+                                        Pending
+                                    {% endif %}
+                                    | Created for {{ task.date }}
+                                </p>
+                                {% if task.description %}
+                                    <p>{{ task.description }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="actions">
+                                {% if not task.completed %}
+                                    <form method="post" action="{% url 'complete-task' task.pk %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-success" type="submit">Mark Complete</button>
+                                    </form>
+                                {% endif %}
+                                <form method="post" action="{% url 'delete-task' task.pk %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty">No tasks yet. Create one above.</p>
+            {% endif %}
+        </section>
+    </main>
 </body>
 </html>

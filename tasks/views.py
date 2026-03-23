@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import status
 
 # Create your views here.
@@ -7,6 +7,39 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Task
 from .serializers import TaskSerializer
+
+
+def index(request):
+    tasks = Task.objects.order_by('completed', '-date', '-id')
+    return render(request, 'index.html', {'tasks': tasks})
+
+
+def create_task_page(request):
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+
+        if title:
+            Task.objects.create(title=title, description=description)
+
+    return redirect('home')
+
+
+def complete_task_page(request, pk):
+    if request.method == 'POST':
+        task = get_object_or_404(Task, pk=pk)
+        task.completed = True
+        task.save(update_fields=['completed'])
+
+    return redirect('home')
+
+
+def delete_task_page(request, pk):
+    if request.method == 'POST':
+        task = get_object_or_404(Task, pk=pk)
+        task.delete()
+
+    return redirect('home')
 
 
 @api_view(['GET'])
