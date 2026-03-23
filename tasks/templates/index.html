@@ -159,6 +159,21 @@
             margin: 0;
         }
 
+        .footer-link {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .footer-link a {
+            color: var(--accent-dark);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 700px) {
             .task-item {
                 flex-direction: column;
@@ -232,6 +247,10 @@
                 <p class="empty">No tasks yet. Create one above.</p>
             {% endif %}
         </section>
+
+        <p class="footer-link">
+            <a href="https://github.com/jayceovaire/DjangoProject" target="_blank" rel="noopener noreferrer">View this project on GitHub</a>
+        </p>
     </main>
 </body>
 </html>
